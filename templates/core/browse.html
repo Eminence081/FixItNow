@@ -2,10 +2,20 @@
 {% block content %}
 <div class="container py-5">
   <div class="section-heading">
-    <h1 class="h3 mb-0">Browse services</h1>
+    <h1 class="h3 mb-0">
+      {% if provider_filter %}
+        Services by {{ provider_filter.profile.business_name|default:provider_filter.get_full_name|default:provider_filter.username }}
+      {% else %}
+        Browse services
+      {% endif %}
+    </h1>
+    {% if provider_id %}
+      <a href="{% url 'browse_services' %}" class="small">&larr; Clear provider filter</a>
+    {% endif %}
   </div>
 
   <form method="get" class="row g-2 mb-4">
+    {% if provider_id %}<input type="hidden" name="provider" value="{{ provider_id }}">{% endif %}
     <div class="col-md-5">
       <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search services...">
     </div>
