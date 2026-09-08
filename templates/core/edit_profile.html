@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5" style="max-width:560px;">
+  <div class="card-plain p-4 p-md-5">
+    <h1 class="h3 mb-4">Edit profile</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if profile.role == "provider" %}
+        <div class="mb-3"><label class="form-label">Business name</label>{{ form.business_name }}</div>
+        <div class="mb-3"><label class="form-label">Bio</label>{{ form.bio }}</div>
+        <div class="mb-3"><label class="form-label">Years of experience</label>{{ form.years_experience }}</div>
+      {% endif %}
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label">City</label>{{ form.city }}</div>
+        <div class="col-md-6"><label class="form-label">Phone</label>{{ form.phone }}</div>
+      </div>
+      <div class="mb-4"><label class="form-label">Avatar</label>{{ form.avatar }}</div>
+      <button type="submit" class="btn btn-accent w-100">Save changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center section-heading">
+    <h1 class="h3 mb-0">Provider dashboard</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'edit_profile' %}" class="btn btn-outline-ink btn-sm">Edit profile</a>
+      <a href="{% url 'add_service' %}" class="btn btn-accent btn-sm">List a service</a>
+    </div>
+  </div>
+
+  <h2 class="h5 mb-3">Incoming bookings</h2>
+  {% for b in bookings %}
+    <div class="card-plain p-3 mb-3">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="fw-bold">{{ b.service.title }}</div>
+          <div class="text-muted small">from {{ b.client.get_full_name|default:b.client.username }} · {{ b.scheduled_date }} at {{ b.scheduled_time }}</div>
+          <div class="text-muted small">{{ b.address }}{% if b.notes %} · "{{ b.notes }}"{% endif %}</div>
+        </div>
+        <div class="text-end">
+          <span class="status-pill status-{{ b.status }}">{{ b.status }}</span>
+          <div class="mt-2 d-flex gap-2 justify-content-end">
+            {% if b.status == "pending" %}
+              <a href="{% url 'update_booking_status' b.pk 'confirmed' %}" class="btn btn-sm btn-accent">Confirm</a>
+              <a href="{% url 'update_booking_status' b.pk 'declined' %}" class="btn btn-sm btn-outline-ink">Decline</a>
+            {% elif b.status == "confirmed" %}
+              <a href="{% url 'update_booking_status' b.pk 'completed' %}" class="btn btn-sm btn-accent">Mark completed</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">No bookings yet.</p>
+  {% endfor %}
+
+  <h2 class="h5 mb-3 mt-5">My services</h2>
+  <div class="row g-3">
+    {% for s in services %}
+      <div class="col-md-4">
+        <div class="card-plain p-3 h-100">
+          <span class="badge-cat">{{ s.category.name }}</span>
+          <h3 class="h6 mt-2">{{ s.title }}</h3>
+          <div class="price-tag mb-2">₦{{ s.price|floatformat:0 }}</div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-muted small">{% if s.is_active %}Active{% else %}Paused{% endif %}</span>
+            <div class="d-flex gap-2">
+              <a href="{% url 'edit_service' s.pk %}" class="btn btn-sm btn-outline-ink">Edit</a>
+              <a href="{% url 'delete_service' s.pk %}" class="btn btn-sm btn-outline-ink text-danger">Delete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">You haven't listed any services yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

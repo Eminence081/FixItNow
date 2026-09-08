@@ -1,0 +1,65 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="section-heading">
+    <h1 class="h3 mb-0">Browse services</h1>
+  </div>
+
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search services...">
+    </div>
+    <div class="col-md-3">
+      <input type="text" name="city" value="{{ city }}" class="form-control" placeholder="City">
+    </div>
+    <div class="col-md-3">
+      <select name="category" class="form-select">
+        <option value="">All categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1">
+      <button class="btn btn-accent w-100" type="submit">Go</button>
+    </div>
+  </form>
+
+  <div class="row g-4">
+    {% for s in page_obj %}
+      <div class="col-md-4">
+        <a href="{% url 'service_detail' s.pk %}" class="text-decoration-none">
+          <div class="service-card">
+            <div class="thumb">{{ s.category.icon }}</div>
+            <div class="body">
+              <span class="badge-cat">{{ s.category.name }}</span>
+              <h3 class="h6 mt-2 mb-1 text-ink">{{ s.title }}</h3>
+              <div class="text-muted small mb-2">{{ s.provider.get_full_name|default:s.provider.username }} · {{ s.city }}</div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="price-tag">₦{{ s.price|floatformat:0 }}</span>
+                {% if s.average_rating %}<span class="rating-pill">⭐ {{ s.average_rating }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p class="text-muted">No services match your search.</p>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+    <nav class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&category={{ selected_category }}&city={{ city }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&category={{ selected_category }}&city={{ city }}">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

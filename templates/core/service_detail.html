@@ -1,0 +1,62 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-5">
+    <div class="col-lg-8">
+      <span class="badge-cat">{{ service.category.name }}</span>
+      <h1 class="h2 mt-2">{{ service.title }}</h1>
+      <p class="text-muted">{{ service.city }} · {{ service.duration_minutes }} min</p>
+      <div class="thumb service-card mb-4" style="height:280px; display:flex; align-items:center; justify-content:center; font-size:4rem;">
+        {{ service.category.icon }}
+      </div>
+      <h2 class="h5">About this service</h2>
+      <p>{{ service.description|linebreaks }}</p>
+
+      <h2 class="h5 mt-5 section-heading pb-3">Reviews {% if service.average_rating %}<span class="rating-pill">⭐ {{ service.average_rating }}</span>{% endif %}</h2>
+      {% for r in reviews %}
+        <div class="card-plain p-3 mb-3">
+          <div class="d-flex justify-content-between">
+            <strong>{{ r.booking.client.get_full_name|default:r.booking.client.username }}</strong>
+            <span class="rating-pill">⭐ {{ r.rating }}</span>
+          </div>
+          <p class="mb-0 text-muted mt-1">{{ r.comment }}</p>
+        </div>
+      {% empty %}
+        <p class="text-muted">No reviews yet — be the first to book and review.</p>
+      {% endfor %}
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-plain p-4 sticky-top" style="top:6rem;">
+        <div class="price-tag mb-1" style="font-size:1.6rem;">₦{{ service.price|floatformat:0 }}</div>
+        <p class="text-muted small mb-3">Starting price</p>
+        <a href="{% url 'book_service' service.pk %}" class="btn btn-accent w-100 mb-4">Book this service</a>
+
+        <hr>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:48px;height:48px;font-weight:700;">
+            {{ service.provider.username|slice:":1"|upper }}
+          </div>
+          <div>
+            <div class="fw-bold">{{ provider_profile.business_name|default:service.provider.get_full_name|default:service.provider.username }}</div>
+            <div class="text-muted small">
+              {% if provider_profile.average_rating %}⭐ {{ provider_profile.average_rating }} ·{% endif %}
+              {{ provider_profile.completed_jobs }} jobs done
+            </div>
+          </div>
+        </div>
+        {% if provider_profile.bio %}<p class="text-muted small mt-2">{{ provider_profile.bio }}</p>{% endif %}
+        <div class="text-muted small">{{ provider_profile.years_experience }} yrs experience · {{ provider_profile.city }}</div>
+
+        {% if other_services %}
+          <hr>
+          <div class="small fw-bold mb-2">Other services by this provider</div>
+          {% for os in other_services %}
+            <a href="{% url 'service_detail' os.pk %}" class="d-block small mb-1">{{ os.title }} — ₦{{ os.price|floatformat:0 }}</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

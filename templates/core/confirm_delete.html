@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5" style="max-width:480px;">
+  <div class="card-plain p-4 p-md-5">
+    <h1 class="h4 mb-3">Delete this {{ object_type }}?</h1>
+    <p class="text-muted">You're about to permanently delete <strong>{{ object_label }}</strong>. This can't be undone.</p>
+    <form method="post" id="delete-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-accent w-100 mb-2" id="delete-confirm-btn" disabled>
+        Yes, delete it
+      </button>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="confirm-check">
+        <label class="form-check-label small text-muted" for="confirm-check">I understand this is permanent</label>
+      </div>
+    </form>
+    <a href="{% url cancel_url %}" class="btn btn-outline-ink w-100">Cancel</a>
+  </div>
+</div>
+<script>
+  // Custom JS: the delete button stays disabled until the user explicitly
+  // ticks the confirmation checkbox, adding a real click-guard beyond just
+  // a browser confirm() popup.
+  document.getElementById('confirm-check').addEventListener('change', function () {
+    document.getElementById('delete-confirm-btn').disabled = !this.checked;
+  });
+</script>
+{% endblock %}

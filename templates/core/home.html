@@ -1,0 +1,136 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <h1>Trusted trades, booked in minutes — not phone calls.</h1>
+        <p class="lede">FixItNow connects verified plumbers, electricians, cleaners and movers with people who need the job done right. Compare prices, check reviews, book a slot.</p>
+        <form action="{% url 'browse_services' %}" method="get" class="d-flex gap-2 mt-4" style="max-width:480px;">
+          <input type="text" name="q" class="form-control form-control-lg" placeholder="What do you need fixed?">
+          <button class="btn btn-accent btn-lg px-4" type="submit">Search</button>
+        </form>
+        <div class="d-flex gap-3 mt-4">
+          <a href="{% url 'browse_services' %}" class="btn btn-outline-ink">Browse services</a>
+          <a href="{% url 'provider_list' %}" class="btn btn-outline-ink">Meet the providers</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="job-ticket" data-tag="JOB #0412">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div class="fw-bold">Leaking kitchen pipe — repair</div>
+              <div class="text-muted small">Booked for tomorrow, 10:00 AM</div>
+            </div>
+            <span class="status-pill status-confirmed">Confirmed</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between small">
+            <span class="text-muted">Provider</span>
+            <span class="fw-semibold">Tunde A. · Plumbing · ⭐ 4.9</span>
+          </div>
+          <div class="d-flex justify-content-between small mt-1">
+            <span class="text-muted">Estimated cost</span>
+            <span class="fw-semibold">₦15,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stat-strip">
+  <div class="container">
+    <div class="row text-center g-3">
+      <div class="col-4">
+        <div class="num">{{ service_count }}</div>
+        <div class="label">Services live</div>
+      </div>
+      <div class="col-4">
+        <div class="num">{{ provider_count }}</div>
+        <div class="label">Verified providers</div>
+      </div>
+      <div class="col-4">
+        <div class="num">{{ completed_count }}</div>
+        <div class="label">Jobs completed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex flex-wrap gap-2 justify-content-center py-4">
+      {% for cat in categories %}
+        <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
+          <span>{{ cat.icon }}</span> {{ cat.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end section-heading">
+      <h2 class="mb-0 h3">Featured services</h2>
+      <a href="{% url 'browse_services' %}">View all &rarr;</a>
+    </div>
+    <div class="row g-4">
+      {% for s in featured %}
+        <div class="col-md-4">
+          <a href="{% url 'service_detail' s.pk %}" class="text-decoration-none">
+            <div class="service-card">
+              <div class="thumb">{{ s.category.icon }}</div>
+              <div class="body">
+                <span class="badge-cat">{{ s.category.name }}</span>
+                <h3 class="h6 mt-2 mb-1 text-ink">{{ s.title }}</h3>
+                <div class="text-muted small mb-2">{{ s.provider.get_full_name|default:s.provider.username }} · {{ s.city }}</div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="price-tag">₦{{ s.price|floatformat:0 }}</span>
+                  {% if s.average_rating %}<span class="rating-pill">⭐ {{ s.average_rating }}</span>{% endif %}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% empty %}
+        <p class="text-muted">No services listed yet — be the first provider.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-white border-top border-bottom" style="border-color: var(--ink) !important; border-width:2px !important;">
+  <div class="container">
+    <h2 class="h3 text-center mb-5">How FixItNow works</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="step-num mb-2">01</div>
+        <h3 class="h5">Search &amp; compare</h3>
+        <p class="text-muted">Browse by category or city, check verified reviews and starting prices.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-num mb-2">02</div>
+        <h3 class="h5">Book a slot</h3>
+        <p class="text-muted">Pick a date, time and address. The provider confirms directly in the app.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-num mb-2">03</div>
+        <h3 class="h5">Job done, pay after</h3>
+        <p class="text-muted">Mark the job complete and leave a review that helps the next customer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container text-center">
+    <h2 class="h3 mb-3">Have a skill? Start earning today.</h2>
+    <p class="text-muted mb-4">Join as a provider and get booked by clients in your city.</p>
+    <a href="{% url 'register' %}" class="btn btn-accent btn-lg px-5">Become a provider</a>
+  </div>
+</section>
+
+{% endblock %}

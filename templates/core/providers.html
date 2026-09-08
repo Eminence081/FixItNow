@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="section-heading"><h1 class="h3 mb-0">Verified providers</h1></div>
+  <div class="row g-4">
+    {% for p in providers %}
+      <div class="col-md-4">
+        <div class="card-plain p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:56px;height:56px;font-weight:700;font-size:1.3rem;">
+              {{ p.user.username|slice:":1"|upper }}
+            </div>
+            <div>
+              <div class="fw-bold">{{ p.business_name|default:p.user.get_full_name|default:p.user.username }}</div>
+              <div class="text-muted small">{{ p.city }}</div>
+            </div>
+          </div>
+          <p class="text-muted small">{{ p.bio|default:"No bio yet." }}</p>
+          <div class="d-flex justify-content-between small">
+            <span>{% if p.average_rating %}⭐ {{ p.average_rating }} ({{ p.review_count }}){% else %}No reviews yet{% endif %}</span>
+            <span class="text-muted">{{ p.completed_jobs }} jobs done</span>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No providers yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

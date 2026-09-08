@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center section-heading">
+    <h1 class="h3 mb-0">My bookings</h1>
+    <a href="{% url 'edit_profile' %}" class="btn btn-outline-ink btn-sm">Edit profile</a>
+  </div>
+
+  {% for b in bookings %}
+    <div class="card-plain p-3 mb-3">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="fw-bold">{{ b.service.title }}</div>
+          <div class="text-muted small">
+            with {{ b.service.provider.get_full_name|default:b.service.provider.username }}
+            · {{ b.scheduled_date }} at {{ b.scheduled_time }}
+          </div>
+          <div class="text-muted small">{{ b.address }}</div>
+        </div>
+        <div class="text-end">
+          <span class="status-pill status-{{ b.status }}">{{ b.status }}</span>
+          <div class="mt-2 d-flex gap-2 justify-content-end">
+            {% if b.status == "pending" or b.status == "confirmed" %}
+              <a href="{% url 'cancel_booking' b.pk %}" class="btn btn-sm btn-outline-ink">Cancel</a>
+            {% endif %}
+            {% if b.status == "completed" and not b.has_review %}
+              <a href="{% url 'leave_review' b.pk %}" class="btn btn-sm btn-accent">Leave review</a>
+            {% endif %}
+            {% if b.status == "completed" and b.has_review %}
+              <a href="{% url 'delete_review' b.review.pk %}" class="btn btn-sm btn-outline-ink text-danger">Delete review</a>
+            {% endif %}
+            {% if b.status == "cancelled" or b.status == "declined" or b.status == "completed" %}
+              <a href="{% url 'delete_booking_record' b.pk %}" class="btn btn-sm btn-outline-ink text-danger">Delete record</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">No bookings yet. <a href="{% url 'browse_services' %}">Browse services</a> to get started.</p>
+  {% endfor %}
+</div>
+{% endblock %}

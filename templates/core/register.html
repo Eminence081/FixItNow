@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5" style="max-width:560px;">
+  <div class="card-plain p-4 p-md-5">
+    <h1 class="h3 mb-4">Create your account</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">I want to...</label>
+        <div class="d-flex gap-3">
+          {% for radio in form.role %}
+            <label class="category-chip">{{ radio.tag }} {{ radio.choice_label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        {{ form.email }}
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">City</label>
+          {{ form.city }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone (optional)</label>
+          {{ form.phone }}
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        {{ form.password1 }}
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Confirm password</label>
+        {{ form.password2 }}
+      </div>
+      {% if form.errors %}
+        <div class="alert alert-danger small">{{ form.errors }}</div>
+      {% endif %}
+      <button type="submit" class="btn btn-accent w-100">Create account</button>
+    </form>
+    <p class="text-center small text-muted mt-3">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}
