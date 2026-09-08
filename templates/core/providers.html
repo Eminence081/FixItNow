@@ -3,7 +3,7 @@
 <div class="container py-5">
   <div class="section-heading"><h1 class="h3 mb-0">Verified providers</h1></div>
   <div class="row g-4">
-        {% for p in providers %}
+    {% for p in providers %}
       <div class="col-md-4">
         <a href="{% url 'browse_services' %}?provider={{ p.user.id }}" class="text-decoration-none">
           <div class="card-plain p-4 h-100">
@@ -27,3 +27,6 @@
     {% empty %}
       <p class="text-muted">No providers yet.</p>
     {% endfor %}
+  </div>
+</div>
+{% endblock %}
