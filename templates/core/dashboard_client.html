@@ -18,6 +18,11 @@
             with {{ b.service.provider.get_full_name|default:b.service.provider.username }}
             · {{ b.scheduled_date }} at {{ b.scheduled_time }}
           </div>
+          {% if b.service.provider.profile.phone %}
+            <a href="tel:{{ b.service.provider.profile.phone }}" class="small text-decoration-none">Call provider: {{ b.service.provider.profile.phone }}</a>
+          {% else %}
+            <div class="text-muted small">Provider phone number not available.</div>
+          {% endif %}
           <div class="text-muted small">{{ b.address }}</div>
         </div>
         <div class="text-end">

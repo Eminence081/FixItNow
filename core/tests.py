@@ -131,3 +131,10 @@ class ProviderDirectoryTests(TestCase):
         self.assertEqual(response.context["provider_profile"], self.provider_profile)
         self.assertIn(self.service, response.context["services"])
         self.assertContains(response, "Prime Fix")
+
+    def test_service_detail_shows_callable_provider_phone(self):
+        response = self.client.get(reverse("service_detail", args=[self.service.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="tel:07000000000"')
+        self.assertContains(response, "Call provider: 07000000000")

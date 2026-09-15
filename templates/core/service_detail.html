@@ -47,6 +47,11 @@
         </div>
         {% if provider_profile.bio %}<p class="text-muted small mt-2">{{ provider_profile.bio }}</p>{% endif %}
         <div class="text-muted small">{{ provider_profile.years_experience }} yrs experience · {{ provider_profile.city }}</div>
+        {% if provider_profile.phone %}
+          <a href="tel:{{ provider_profile.phone }}" class="btn btn-outline-ink btn-sm w-100 mt-3">Call provider: {{ provider_profile.phone }}</a>
+        {% else %}
+          <div class="text-muted small mt-3">Provider phone number not available.</div>
+        {% endif %}
 
         {% if other_services %}
           <hr>
