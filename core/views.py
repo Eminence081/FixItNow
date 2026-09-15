@@ -37,7 +37,10 @@ def browse_services(request):
 
     if query:
         services = services.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(category__name__icontains=query)
+            | Q(category__slug__icontains=query)
         )
     if category_slug:
         services = services.filter(category__slug=category_slug)

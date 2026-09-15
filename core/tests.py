@@ -54,6 +54,13 @@ class BrowseProviderFilterTests(TestCase):
         self.assertEqual(response.context["provider_profile"], self.provider_profile)
         self.assertContains(response, "Services by Fix Teams")
 
+    def test_browse_services_search_matches_category_name_and_slug(self):
+        for query in ["Plumbing", "plumbing"]:
+            response = self.client.get(reverse("browse_services"), {"q": query})
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(self.service, response.context["page_obj"].object_list)
+
 
 class ProviderDirectoryTests(TestCase):
     def setUp(self):
