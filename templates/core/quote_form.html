@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card-plain p-4 p-md-5">
+        <span class="badge-cat">Provider quote</span>
+        <h1 class="h3 mt-3">Quote: {{ service_request.title }}</h1>
+        <p class="text-muted">{{ service_request.city }} · {{ service_request.category.name }}</p>
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <div class="mb-3"><label class="form-label">Your price (₦)</label>{{ form.price }}</div>
+          <div class="mb-4"><label class="form-label">Message</label>{{ form.message }}</div>
+          <button type="submit" class="btn btn-accent w-100">Send quote</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-5">
+    <div class="col-lg-7">
+      <span class="badge-cat">{{ service_request.category.name }}</span>
+      <h1 class="h2 mt-3">{{ service_request.title }}</h1>
+      <p class="text-muted">{{ service_request.city }} · {{ service_request.get_urgency_display }} urgency · {{ service_request.get_status_display }}</p>
+      <div class="card-plain p-4 mb-4">
+        <p class="mb-2">{{ service_request.description|linebreaks }}</p>
+        {% if service_request.budget_range %}<div class="small text-muted">Budget: {{ service_request.budget_range }}</div>{% endif %}
+      </div>
+      <h2 class="h5 section-heading">Quotes</h2>
+      {% for quote in quotes %}
+        <div class="card-plain p-3 mb-3">
+          <div class="d-flex justify-content-between gap-3">
+            <strong>{{ quote.provider.profile.business_name|default:quote.provider.get_full_name|default:quote.provider.username }}</strong>
+            <span class="price-tag">₦{{ quote.price|floatformat:0 }}</span>
+          </div>
+          <p class="text-muted small mt-2 mb-0">{{ quote.message|linebreaksbr }}</p>
+        </div>
+      {% empty %}
+        <p class="text-muted">No quotes yet.</p>
+      {% endfor %}
+    </div>
+    <div class="col-lg-5">
+      <div class="card-plain p-4 sticky-top" style="top:6rem;">
+        <div class="small text-muted">Posted by</div>
+        <div class="fw-bold">{{ service_request.client.get_full_name|default:service_request.client.username }}</div>
+        {% if can_quote %}
+          <a href="{% url 'submit_quote' service_request.pk %}" class="btn btn-accent w-100 mt-4">Submit a quote</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

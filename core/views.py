@@ -1,14 +1,35 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Avg, Count, Q
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
-from .forms import BookingForm, ProfileForm, RegisterForm, ReviewForm, ServiceForm
-from .models import Booking, Category, Profile, Review, Service
+from .forms import (
+    BookingForm,
+    ProfileForm,
+    QuoteForm,
+    RegisterForm,
+    ReviewForm,
+    ReviewReplyForm,
+    ServiceForm,
+    ServiceRequestForm,
+)
+from .models import (
+    Booking,
+    Category,
+    Profile,
+    Quote,
+    Review,
+    SavedProvider,
+    Service,
+    ServiceRequest,
+)
 
 
 def home(request):
@@ -78,9 +99,7 @@ def service_detail(request, pk):
         Service.objects.select_related("provider", "category"), pk=pk
     )
     provider_profile = get_object_or_404(Profile, user=service.provider)
-    reviews = Review.objects.filter(booking__service=service).select_related(
-        "booking__client"
-    )
+    reviews = Review.objects.filter(booking__service=service).select_related("booking__client")
     other_services = Service.objects.filter(
         provider=service.provider, is_active=True
     ).exclude(pk=service.pk)
@@ -90,8 +109,25 @@ def service_detail(request, pk):
         "provider_profile": provider_profile,
         "reviews": reviews,
         "other_services": other_services,
+        "reply_form": ReviewReplyForm(),
+        "can_reply": request.user.is_authenticated and request.user == service.provider,
     }
     return render(request, "core/service_detail.html", context)
+
+
+def provider_saved_ids(request):
+    if not request.user.is_authenticated:
+        return set()
+    try:
+        if request.user.profile.role != "client":
+            return set()
+    except Profile.DoesNotExist:
+        return set()
+    return set(
+        SavedProvider.objects.filter(client=request.user).values_list(
+            "provider_id", flat=True
+        )
+    )
 
 
 def provider_list(request):
@@ -111,7 +147,12 @@ def provider_list(request):
     if city:
         providers = providers.filter(city__icontains=city)
 
-    return render(request, "core/providers.html", {"providers": providers, "query": query, "city": city})
+    return render(request, "core/providers.html", {
+        "providers": providers,
+        "query": query,
+        "city": city,
+        "saved_provider_ids": provider_saved_ids(request),
+    })
 
 
 def provider_detail(request, pk):
@@ -175,19 +216,23 @@ def dashboard(request):
             "service", "client"
         )
         services = Service.objects.filter(provider=request.user)
+        reviews = Review.objects.filter(
+            booking__service__provider=request.user
+        ).select_related("booking__client", "booking__service")
         return render(
             request,
             "core/dashboard_provider.html",
-            {"profile": profile, "bookings": bookings, "services": services},
+            {"profile": profile, "bookings": bookings, "services": services, "reviews": reviews},
         )
     else:
         bookings = Booking.objects.filter(client=request.user).select_related(
             "service", "service__provider"
         )
+        saved_providers = SavedProvider.objects.filter(client=request.user).select_related("provider")
         return render(
             request,
             "core/dashboard_client.html",
-            {"profile": profile, "bookings": bookings},
+            {"profile": profile, "bookings": bookings, "saved_providers": saved_providers},
         )
 
 
@@ -373,3 +418,143 @@ def leave_review(request, pk):
     else:
         form = ReviewForm()
     return render(request, "core/leave_review.html", {"form": form, "booking": booking})
+
+
+@login_required
+def reply_to_review(request, pk):
+    review = get_object_or_404(Review, pk=pk, booking__service__provider=request.user)
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    form = ReviewReplyForm(request.POST, instance=review)
+    if form.is_valid():
+        reply = form.save(commit=False)
+        reply.provider_reply_at = timezone.now()
+        reply.save(update_fields=["provider_reply", "provider_reply_at"])
+        messages.success(request, "Your reply was saved.")
+    return redirect("dashboard")
+
+
+@login_required
+def toggle_save_provider(request, provider_id):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.role != "client":
+        messages.error(request, "Only clients can save providers.")
+        return redirect("provider_list")
+    provider = get_object_or_404(User, pk=provider_id)
+    saved, created = SavedProvider.objects.get_or_create(client=request.user, provider=provider)
+    if not created:
+        saved.delete()
+        messages.success(request, "Provider removed from saved providers.")
+    else:
+        messages.success(request, "Provider saved.")
+    return redirect(request.META.get("HTTP_REFERER") or "provider_list")
+
+
+@login_required
+def post_request(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.role != "client":
+        messages.error(request, "Only clients can post service requests.")
+        return redirect("dashboard")
+    if request.method == "POST":
+        form = ServiceRequestForm(request.POST)
+        if form.is_valid():
+            service_request = form.save(commit=False)
+            service_request.client = request.user
+            service_request.save()
+            messages.success(request, "Your service request is now open for quotes.")
+            return redirect("request_detail", pk=service_request.pk)
+    else:
+        form = ServiceRequestForm(initial={"city": profile.city})
+    return render(request, "core/request_form.html", {"form": form})
+
+
+def browse_requests(request):
+    requests = ServiceRequest.objects.filter(status="open").select_related("client", "category")
+    category_slug = request.GET.get("category", "")
+    city = request.GET.get("city", "").strip()
+    if category_slug:
+        requests = requests.filter(category__slug=category_slug)
+    if city:
+        requests = requests.filter(city__icontains=city)
+    return render(request, "core/browse_requests.html", {
+        "requests": requests,
+        "categories": Category.objects.all(),
+        "selected_category": category_slug,
+        "city": city,
+    })
+
+
+@login_required
+def submit_quote(request, pk):
+    profile = get_object_or_404(Profile, user=request.user)
+    service_request = get_object_or_404(ServiceRequest, pk=pk, status="open")
+    if profile.role != "provider":
+        messages.error(request, "Only providers can submit quotes.")
+        return redirect("request_detail", pk=pk)
+    if request.method == "POST":
+        form = QuoteForm(request.POST)
+        if form.is_valid():
+            quote = form.save(commit=False)
+            quote.request = service_request
+            quote.provider = request.user
+            quote.save()
+            messages.success(request, "Your quote was submitted.")
+            return redirect("request_detail", pk=pk)
+    else:
+        form = QuoteForm()
+    return render(request, "core/quote_form.html", {"form": form, "service_request": service_request})
+
+
+def request_detail(request, pk):
+    service_request = get_object_or_404(
+        ServiceRequest.objects.select_related("client", "category"), pk=pk
+    )
+    quotes = service_request.quotes.select_related("provider", "provider__profile")
+    can_quote = False
+    if request.user.is_authenticated:
+        try:
+            can_quote = request.user.profile.role == "provider" and service_request.status == "open"
+        except Profile.DoesNotExist:
+            pass
+    return render(request, "core/request_detail.html", {
+        "service_request": service_request,
+        "quotes": quotes,
+        "can_quote": can_quote,
+    })
+
+
+@login_required
+def admin_analytics(request):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to view analytics.")
+        return redirect("home")
+    users = User.objects.count()
+    providers = Profile.objects.filter(role="provider").count()
+    clients = Profile.objects.filter(role="client").count()
+    services = Service.objects.count()
+    active_services = Service.objects.filter(is_active=True).count()
+    inactive_services = services - active_services
+    bookings_by_status = list(
+        Booking.objects.values("status").annotate(total=Count("id")).order_by("status")
+    )
+    review_summary = Review.objects.aggregate(total=Count("id"), average=Avg("rating"))
+    recent_bookings = Booking.objects.filter(
+        created_at__gte=timezone.now() - timedelta(days=7)
+    ).count()
+    max_bookings = max((item["total"] for item in bookings_by_status), default=1)
+    return render(request, "core/admin_analytics.html", {
+        "users": users,
+        "providers": providers,
+        "clients": clients,
+        "services": services,
+        "active_services": active_services,
+        "inactive_services": inactive_services,
+        "bookings_by_status": bookings_by_status,
+        "review_total": review_summary["total"] or 0,
+        "average_rating": review_summary["average"],
+        "recent_bookings": recent_bookings,
+        "max_bookings": max_bookings,
+    })

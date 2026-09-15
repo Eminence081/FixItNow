@@ -134,7 +134,48 @@ class Review(models.Model):
     )
     rating = models.PositiveSmallIntegerField()
     comment = models.TextField(blank=True)
+    provider_reply = models.TextField(blank=True)
+    provider_reply_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.rating}★ for {self.booking.service.title}"
+
+
+class SavedProvider(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_providers")
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_by_clients")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("client", "provider")
+        ordering = ["-created_at"]
+
+
+class ServiceRequest(models.Model):
+    URGENCY_CHOICES = [("low", "Low"), ("medium", "Medium"), ("high", "High")]
+    STATUS_CHOICES = [("open", "Open"), ("closed", "Closed")]
+
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="service_requests")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="service_requests")
+    title = models.CharField(max_length=120)
+    description = models.TextField()
+    budget_range = models.CharField(max_length=60, blank=True)
+    city = models.CharField(max_length=80)
+    urgency = models.CharField(max_length=10, choices=URGENCY_CHOICES, default="medium")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="open")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class Quote(models.Model):
+    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name="quotes")
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name="quotes_submitted")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]

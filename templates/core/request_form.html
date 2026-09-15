@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card-plain p-4 p-md-5">
+        <span class="badge-cat">Client request</span>
+        <h1 class="h3 mt-3 mb-4">Post a service request</h1>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><label class="form-label">Category</label>{{ form.category }}</div>
+            <div class="col-md-6"><label class="form-label">Title</label>{{ form.title }}</div>
+          </div>
+          <div class="mb-3"><label class="form-label">Description</label>{{ form.description }}</div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4"><label class="form-label">Budget range</label>{{ form.budget_range }}</div>
+            <div class="col-md-4"><label class="form-label">City</label>{{ form.city }}</div>
+            <div class="col-md-4"><label class="form-label">Urgency</label>{{ form.urgency }}</div>
+          </div>
+          <button type="submit" class="btn btn-accent w-100">Post request</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

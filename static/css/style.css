@@ -596,6 +596,20 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
   background: var(--green);
 }
 
+.analytics-bar {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--paper-soft);
+  overflow: hidden;
+}
+
+.analytics-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+}
+
 .form-control,
 .form-select,
 .form-check-input {

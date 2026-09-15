@@ -35,7 +35,9 @@
             {% endif %}
             {% if b.status == "completed" and not b.has_review %}
               <a href="{% url 'leave_review' b.pk %}" class="btn btn-sm btn-accent">Leave review</a>
+              <a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>
             {% endif %}
+            {% if b.status == "completed" and b.has_review %}<a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>{% endif %}
             {% if b.status == "completed" and b.has_review %}
               <a href="{% url 'delete_review' b.review.pk %}" class="btn btn-sm btn-outline-ink text-danger">Delete review</a>
             {% endif %}
@@ -49,5 +51,22 @@
   {% empty %}
     <p class="text-muted">No bookings yet. <a href="{% url 'browse_services' %}">Browse services</a> to get started.</p>
   {% endfor %}
+
+  <section class="mt-5">
+    <h2 class="h5 mb-3">Saved providers</h2>
+    <div class="row g-3">
+      {% for saved in saved_providers %}
+        <div class="col-md-4">
+          <div class="card-plain p-3 h-100">
+            <div class="fw-bold">{{ saved.provider.profile.business_name|default:saved.provider.get_full_name|default:saved.provider.username }}</div>
+            <div class="text-muted small">{{ saved.provider.profile.city }}</div>
+            <a href="{% url 'provider_detail' saved.provider.pk %}" class="small">View provider</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No saved providers yet.</p>
+      {% endfor %}
+    </div>
+  </section>
 </div>
 {% endblock %}

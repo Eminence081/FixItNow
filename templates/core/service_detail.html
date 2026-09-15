@@ -20,6 +20,18 @@
             <span class="rating-pill">⭐ {{ r.rating }}</span>
           </div>
           <p class="mb-0 text-muted mt-1">{{ r.comment }}</p>
+          {% if r.provider_reply %}
+            <div class="mt-3 ps-3 border-start border-2">
+              <div class="small fw-semibold">Provider reply</div>
+              <p class="mb-0 text-muted small">{{ r.provider_reply|linebreaksbr }}</p>
+            </div>
+          {% elif can_reply %}
+            <form method="post" action="{% url 'reply_to_review' r.pk %}" class="mt-3">
+              {% csrf_token %}
+              {{ reply_form.provider_reply }}
+              <button type="submit" class="btn btn-sm btn-outline-ink mt-2">Reply to review</button>
+            </form>
+          {% endif %}
         </div>
       {% empty %}
         <p class="text-muted">No reviews yet — be the first to book and review.</p>

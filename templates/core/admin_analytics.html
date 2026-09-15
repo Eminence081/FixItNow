@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="section-heading">
+    <span class="badge-cat">Staff only</span>
+    <h1 class="h3 mt-3 mb-0">Platform analytics</h1>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3"><div class="card-plain p-4 h-100"><div class="text-muted small">Total users</div><div class="display-6 fw-bold">{{ users }}</div></div></div>
+    <div class="col-sm-6 col-lg-3"><div class="card-plain p-4 h-100"><div class="text-muted small">Providers</div><div class="display-6 fw-bold">{{ providers }}</div></div></div>
+    <div class="col-sm-6 col-lg-3"><div class="card-plain p-4 h-100"><div class="text-muted small">Clients</div><div class="display-6 fw-bold">{{ clients }}</div></div></div>
+    <div class="col-sm-6 col-lg-3"><div class="card-plain p-4 h-100"><div class="text-muted small">Bookings last 7 days</div><div class="display-6 fw-bold">{{ recent_bookings }}</div></div></div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card-plain p-4 h-100">
+        <h2 class="h5">Services</h2>
+        <p class="mb-1">{{ services }} total</p>
+        <p class="text-muted small mb-0">{{ active_services }} active · {{ inactive_services }} inactive</p>
+        <hr>
+        <h2 class="h5">Reviews</h2>
+        <p class="mb-1">{{ review_total }} total reviews</p>
+        <p class="text-muted small mb-0">Platform average: {% if average_rating %}{{ average_rating|floatformat:1 }} / 5{% else %}No ratings yet{% endif %}</p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-plain p-4 h-100">
+        <h2 class="h5 mb-4">Bookings by status</h2>
+        {% for item in bookings_by_status %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small text-capitalize"><span>{{ item.status }}</span><strong>{{ item.total }}</strong></div>
+            <div class="analytics-bar"><span style="width: {% widthratio item.total max_bookings 100 %}%"></span></div>
+          </div>
+        {% empty %}
+          <p class="text-muted">No bookings yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

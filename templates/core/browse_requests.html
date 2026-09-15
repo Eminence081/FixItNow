@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="section-heading d-flex justify-content-between align-items-end gap-3 flex-wrap">
+    <h1 class="h3 mb-0">Open service requests</h1>
+    <a href="{% url 'browse_requests' %}" class="small">Clear filters</a>
+  </div>
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+      <select name="category" class="form-select">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category.slug }}" {% if category.slug == selected_category %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-5"><input type="text" name="city" value="{{ city }}" class="form-control" placeholder="City"></div>
+    <div class="col-md-2"><button type="submit" class="btn btn-accent w-100">Filter</button></div>
+  </form>
+  <div class="row g-4">
+    {% for item in requests %}
+      <div class="col-md-6">
+        <a href="{% url 'request_detail' item.pk %}" class="text-decoration-none">
+          <div class="card-plain p-4 h-100">
+            <div class="d-flex justify-content-between gap-3">
+              <span class="badge-cat">{{ item.category.name }}</span>
+              <span class="status-pill status-{{ item.urgency }}">{{ item.urgency }}</span>
+            </div>
+            <h2 class="h5 mt-3 text-ink">{{ item.title }}</h2>
+            <p class="text-muted small">{{ item.description|truncatewords:24 }}</p>
+            <div class="small text-muted">{{ item.city }}{% if item.budget_range %} · {{ item.budget_range }}{% endif %}</div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p class="text-muted">No open requests match these filters.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

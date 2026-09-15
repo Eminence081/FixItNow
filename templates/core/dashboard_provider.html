@@ -58,6 +58,30 @@
   </section>
 
   <section>
+    <h2 class="h5 mb-3 mt-5">Reviews to answer</h2>
+    {% for review in reviews %}
+      <div class="card-plain p-3 mb-3">
+        <div class="d-flex justify-content-between gap-2">
+          <strong>{{ review.booking.client.get_full_name|default:review.booking.client.username }}</strong>
+          <span class="rating-pill">⭐ {{ review.rating }}</span>
+        </div>
+        <p class="text-muted small mt-1 mb-2">{{ review.comment }}</p>
+        {% if review.provider_reply %}
+          <div class="small text-muted">Your reply: {{ review.provider_reply }}</div>
+        {% else %}
+          <form method="post" action="{% url 'reply_to_review' review.pk %}">
+            {% csrf_token %}
+            <textarea name="provider_reply" class="form-control" rows="2" placeholder="Reply to this review"></textarea>
+            <button type="submit" class="btn btn-sm btn-outline-ink mt-2">Reply</button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="text-muted">No reviews yet.</p>
+    {% endfor %}
+  </section>
+
+  <section>
     <h2 class="h5 mb-3 mt-5">My services</h2>
     <div class="row g-3">
       {% for s in services %}

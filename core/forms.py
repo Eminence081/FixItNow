@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Profile, Service, Booking, Review
+from .models import Profile, Service, Booking, Review, ServiceRequest, Quote
 
 
 class BootstrapFormMixin:
@@ -76,3 +76,24 @@ class ReviewForm(BootstrapFormMixin, forms.ModelForm):
             "rating": forms.Select(choices=[(i, f"{i} star{'s' if i != 1 else ''}") for i in range(1, 6)]),
             "comment": forms.Textarea(attrs={"rows": 3}),
         }
+
+
+class ReviewReplyForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ["provider_reply"]
+        widgets = {"provider_reply": forms.Textarea(attrs={"rows": 3})}
+
+
+class ServiceRequestForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = ServiceRequest
+        fields = ["category", "title", "description", "budget_range", "city", "urgency"]
+        widgets = {"description": forms.Textarea(attrs={"rows": 5})}
+
+
+class QuoteForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Quote
+        fields = ["price", "message"]
+        widgets = {"message": forms.Textarea(attrs={"rows": 4})}

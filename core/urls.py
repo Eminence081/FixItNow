@@ -13,6 +13,7 @@ urlpatterns = [
     path("services/<int:pk>/delete/", views.delete_service, name="delete_service"),
     path("providers/", views.provider_list, name="provider_list"),
     path("providers/<int:pk>/", views.provider_detail, name="provider_detail"),
+    path("providers/<int:provider_id>/save/", views.toggle_save_provider, name="toggle_save_provider"),
 
     path("register/", views.register, name="register"),
     path("login/", auth_views.LoginView.as_view(template_name="core/login.html"), name="login"),
@@ -21,10 +22,16 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("profile/toggle-availability/", views.toggle_availability, name="toggle_availability"),
+    path("analytics/", views.admin_analytics, name="admin_analytics"),
 
     path("bookings/<int:pk>/status/<str:status>/", views.update_booking_status, name="update_booking_status"),
     path("bookings/<int:pk>/cancel/", views.cancel_booking, name="cancel_booking"),
     path("bookings/<int:pk>/review/", views.leave_review, name="leave_review"),
     path("bookings/<int:pk>/delete/", views.delete_booking_record, name="delete_booking_record"),
     path("reviews/<int:pk>/delete/", views.delete_review, name="delete_review"),
+    path("reviews/<int:pk>/reply/", views.reply_to_review, name="reply_to_review"),
+    path("requests/new/", views.post_request, name="post_request"),
+    path("requests/", views.browse_requests, name="browse_requests"),
+    path("requests/<int:pk>/", views.request_detail, name="request_detail"),
+    path("requests/<int:pk>/quote/", views.submit_quote, name="submit_quote"),
 ]

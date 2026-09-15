@@ -21,8 +21,16 @@
   <div class="row g-4">
     {% for p in providers %}
       <div class="col-md-4">
-        <a href="{% url 'provider_detail' p.user.id %}" class="text-decoration-none">
-          <div class="card-plain p-4 h-100">
+        <div class="card-plain p-4 h-100">
+          {% if user.is_authenticated and user.profile.role == "client" %}
+            <form method="post" action="{% url 'toggle_save_provider' p.user.id %}" class="text-end mb-2">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-ink" title="{% if p.user.id in saved_provider_ids %}Remove saved provider{% else %}Save provider{% endif %}">
+                {% if p.user.id in saved_provider_ids %}♥{% else %}♡{% endif %}
+              </button>
+            </form>
+          {% endif %}
+          <a href="{% url 'provider_detail' p.user.id %}" class="text-decoration-none">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="d-flex align-items-center justify-content-center rounded-circle bg-light" style="width:56px;height:56px;font-weight:700;font-size:1.3rem;">
                 {{ p.user.username|slice:":1"|upper }}
@@ -41,8 +49,8 @@
               <span>{% if p.average_rating %}⭐ {{ p.average_rating }} ({{ p.review_count }}){% else %}No reviews yet{% endif %}</span>
               <span class="text-muted">{{ p.completed_jobs }} jobs done</span>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
     {% empty %}
       <p class="text-muted">No providers match your search.</p>
