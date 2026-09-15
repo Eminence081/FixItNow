@@ -2,7 +2,8 @@
 
 A local trades marketplace — plumbers, electricians, cleaners, movers.
 Clients browse services, book a slot, and pay on completion. Providers
-list services, confirm/decline bookings, and get reviewed.
+list services, confirm/decline bookings, and get reviewed. Production uses
+PostgreSQL so accounts and bookings survive Render restarts and deploys.
 
 ## Local setup
 
@@ -96,11 +97,11 @@ Then deploy any future changes with:
 eb deploy
 ```
 
-**Note on the database:** by default this uses SQLite, which does not
-persist reliably on Elastic Beanstalk (the instance can be replaced,
-wiping local files). That's fine for a demo/portfolio deployment. For a
-real production app, provision an RDS PostgreSQL instance and update
-`DATABASES` in `settings.py` accordingly.
+**Note on the database:** local development falls back to SQLite. Render
+uses the PostgreSQL database declared in `render.yaml`, so accounts,
+bookings, and other application data persist across restarts and deploys.
+For AWS Elastic Beanstalk, set `DATABASE_URL` to an RDS PostgreSQL
+connection string before deploying.
 
 **When you're done demoing:** run `eb terminate fixitnow-env` to avoid
 any ongoing AWS charges — don't just leave the environment running.
