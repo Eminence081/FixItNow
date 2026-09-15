@@ -39,6 +39,10 @@
           </div>
           <div>
             <div class="fw-bold">{{ provider_profile.business_name|default:service.provider.get_full_name|default:service.provider.username }}</div>
+            <div class="availability-status {% if provider_profile.is_available %}is-available{% else %}is-busy{% endif %}">
+              <span class="availability-dot" aria-hidden="true"></span>
+              {% if provider_profile.is_available %}Available now{% else %}Busy{% if provider_profile.status_note %} ({{ provider_profile.status_note }}){% endif %}{% endif %}
+            </div>
             <div class="text-muted small">
               {% if provider_profile.average_rating %}⭐ {{ provider_profile.average_rating }} ·{% endif %}
               {{ provider_profile.completed_jobs }} jobs done

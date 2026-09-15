@@ -572,6 +572,30 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
 .status-completed { background: var(--green-soft); color: var(--green-deep); }
 .status-declined, .status-cancelled { background: var(--red-soft); color: var(--red); }
 
+.availability-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.availability-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.availability-status.is-available {
+  color: var(--green);
+}
+
+.availability-status.is-available .availability-dot {
+  background: var(--green);
+}
+
 .form-control,
 .form-select,
 .form-check-input {

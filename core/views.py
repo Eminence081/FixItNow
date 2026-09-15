@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import BookingForm, ProfileForm, RegisterForm, ReviewForm, ServiceForm
@@ -143,12 +144,21 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Profile.objects.create(
-                user=user,
-                role=form.cleaned_data["role"],
-                city=form.cleaned_data["city"],
-                phone=form.cleaned_data.get("phone", ""),
-            )
+            profile_data = {
+                "user": user,
+                "role": form.cleaned_data["role"],
+                "city": form.cleaned_data["city"],
+                "phone": form.cleaned_data.get("phone", ""),
+            }
+            if profile_data["role"] == "provider":
+                profile_data.update({
+                    "business_name": form.cleaned_data.get("business_name", ""),
+                    "bio": form.cleaned_data.get("bio", ""),
+                    "years_experience": form.cleaned_data.get("years_experience") or 0,
+                    "is_available": form.cleaned_data.get("is_available", True),
+                    "status_note": form.cleaned_data.get("status_note", ""),
+                })
+            Profile.objects.create(**profile_data)
             login(request, user)
             messages.success(request, "Welcome to FixItNow! Your account is ready.")
             return redirect("dashboard")
@@ -193,6 +203,19 @@ def edit_profile(request):
     else:
         form = ProfileForm(instance=profile)
     return render(request, "core/edit_profile.html", {"form": form, "profile": profile})
+
+
+@login_required
+def toggle_availability(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    profile = get_object_or_404(Profile, user=request.user)
+    profile.is_available = not profile.is_available
+    profile.save(update_fields=["is_available"])
+    state = "available" if profile.is_available else "busy"
+    messages.success(request, f"You're now marked as {state}.")
+    return redirect("dashboard")
 
 
 @login_required

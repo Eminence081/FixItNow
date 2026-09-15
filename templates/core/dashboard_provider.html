@@ -5,6 +5,18 @@
     <div>
       <span class="badge-cat">Provider dashboard</span>
       <h1 class="h3 mb-0 mt-2">Provider dashboard</h1>
+      <div class="availability-status {% if profile.is_available %}is-available{% else %}is-busy{% endif %} mt-2">
+        <span class="availability-dot" aria-hidden="true"></span>
+        {% if profile.is_available %}Available now{% else %}Busy{% if profile.status_note %} ({{ profile.status_note }}){% endif %}{% endif %}
+      </div>
+      <form method="post" action="{% url 'toggle_availability' %}" class="mt-2">
+        {% csrf_token %}
+        {% if profile.is_available %}
+          <button type="submit" class="btn btn-sm btn-outline-ink">Mark as busy</button>
+        {% else %}
+          <button type="submit" class="btn btn-sm btn-accent">Mark as available</button>
+        {% endif %}
+      </form>
     </div>
     <div class="d-flex gap-2 flex-wrap">
       <a href="{% url 'edit_profile' %}" class="btn btn-outline-ink btn-sm">Edit profile</a>

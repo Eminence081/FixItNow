@@ -19,6 +19,12 @@ class Profile(models.Model):
     bio = models.TextField(blank=True)
     years_experience = models.PositiveIntegerField(default=0)
     is_approved = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=True)
+    status_note = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="e.g. 'Busy until 3pm', 'On a job'",
+    )
 
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} ({self.role})"

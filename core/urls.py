@@ -20,6 +20,7 @@ urlpatterns = [
 
     path("dashboard/", views.dashboard, name="dashboard"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
+    path("profile/toggle-availability/", views.toggle_availability, name="toggle_availability"),
 
     path("bookings/<int:pk>/status/<str:status>/", views.update_booking_status, name="update_booking_status"),
     path("bookings/<int:pk>/cancel/", views.cancel_booking, name="cancel_booking"),

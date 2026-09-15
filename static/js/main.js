@@ -65,4 +65,19 @@ document.addEventListener('DOMContentLoaded', function () {
     dateInput.setAttribute('min', today);
   }
 
+  // --- Provider registration fields ----------------------------------
+  const providerFields = document.getElementById('provider-fields');
+  const roleInputs = document.querySelectorAll('input[name="role"]');
+  if (providerFields && roleInputs.length) {
+    function updateProviderFields() {
+      const providerSelected = document.querySelector('input[name="role"]:checked')?.value === 'provider';
+      providerFields.hidden = !providerSelected;
+    }
+
+    roleInputs.forEach(function (input) {
+      input.addEventListener('change', updateProviderFields);
+    });
+    updateProviderFields();
+  }
+
 });
