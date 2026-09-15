@@ -19,6 +19,21 @@ python manage.py runserver
 
 Visit http://127.0.0.1:8000/
 
+### Render admin access
+
+Render Free does not provide a Shell. To create or reset the deployment
+admin, add these environment variables in the Render service dashboard:
+
+```
+DJANGO_ADMIN_USERNAME=your-admin-username
+DJANGO_ADMIN_EMAIL=your-email@example.com
+DJANGO_ADMIN_PASSWORD=your-private-password
+```
+
+Redeploy after saving them. The build creates or updates that staff account,
+then you can sign in at `/admin/` or `/analytics/`. The password is read only
+from Render's environment and is never stored in the repository.
+
 ## Demo accounts (after running seed_demo)
 
 Password for all: `demopass123`
