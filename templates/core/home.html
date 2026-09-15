@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load core_extras %}
 {% block content %}
 
 <section class="hero">
@@ -17,7 +18,46 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <div class="job-ticket" data-tag="JOB #0412">
+        <div class="hero-visual">
+          <svg viewBox="0 0 480 400" class="hero-illustration" xmlns="http://www.w3.org/2000/svg">
+            <!-- blueprint corner brackets -->
+            <path d="M10 30 V10 H30" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <path d="M450 10 H470 V30" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <path d="M470 370 V390 H450" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <path d="M30 390 H10 V370" fill="none" stroke="var(--ink)" stroke-width="2"/>
+
+            <!-- house outline -->
+            <path d="M110 210 L240 110 L370 210 V330 H110 Z" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+            <rect x="215" y="270" width="50" height="60" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <rect x="150" y="240" width="35" height="35" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+            <rect x="295" y="240" width="35" height="35" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="240" y1="330" x2="240" y2="110" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>
+
+            <!-- measurement ticks -->
+            <line x1="110" y1="345" x2="370" y2="345" stroke="var(--slate)" stroke-width="1"/>
+            <line x1="110" y1="340" x2="110" y2="350" stroke="var(--slate)" stroke-width="1"/>
+            <line x1="370" y1="340" x2="370" y2="350" stroke="var(--slate)" stroke-width="1"/>
+            <text x="240" y="362" text-anchor="middle" font-size="11" fill="var(--slate)" font-family="Inter, sans-serif">FixItNow service map</text>
+
+            <!-- leader lines to service pins -->
+            <line x1="167" y1="240" x2="90" y2="150" stroke="var(--slate)" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="313" y1="240" x2="410" y2="150" stroke="var(--slate)" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="240" y1="270" x2="240" y2="60" stroke="var(--slate)" stroke-width="1" stroke-dasharray="3 3"/>
+
+            <!-- pin: plumbing -->
+            <circle cx="90" cy="150" r="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <svg x="76" y="136" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{{ "plumbing"|category_icon_paths }}</svg>
+
+            <!-- pin: electrical -->
+            <circle cx="410" cy="150" r="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <svg x="396" y="136" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{{ "electrical"|category_icon_paths }}</svg>
+
+            <!-- pin: cleaning -->
+            <circle cx="240" cy="60" r="26" fill="var(--amber)" stroke="var(--ink)" stroke-width="2"/>
+            <svg x="226" y="46" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{{ "cleaning"|category_icon_paths }}</svg>
+          </svg>
+        </div>
+        <div class="job-ticket job-ticket-float" data-tag="JOB #0412">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
               <div class="fw-bold">Leaking kitchen pipe — repair</div>
@@ -64,7 +104,7 @@
     <div class="d-flex flex-wrap gap-2 justify-content-center py-4">
       {% for cat in categories %}
         <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
-          <span>{{ cat.icon }}</span> {{ cat.name }}
+          <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
         </a>
       {% endfor %}
     </div>
@@ -82,7 +122,7 @@
         <div class="col-md-4">
           <a href="{% url 'service_detail' s.pk %}" class="text-decoration-none">
             <div class="service-card">
-              <div class="thumb">{{ s.category.icon }}</div>
+              <div class="thumb"><span class="icon-badge">{{ s.category.slug|category_icon }}</span></div>
               <div class="body">
                 <span class="badge-cat">{{ s.category.name }}</span>
                 <h3 class="h6 mt-2 mb-1 text-ink">{{ s.title }}</h3>

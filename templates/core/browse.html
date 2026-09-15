@@ -1,10 +1,11 @@
 {% extends "core/base.html" %}
+{% load core_extras %}
 {% block content %}
 <div class="container py-5">
   <div class="section-heading">
     <h1 class="h3 mb-0">
-      {% if provider_filter %}
-        Services by {{ provider_filter.profile.business_name|default:provider_filter.get_full_name|default:provider_filter.username }}
+      {% if provider_profile %}
+        Services by {{ provider_profile.business_name|default:provider_profile.user.get_full_name|default:provider_profile.user.username }}
       {% else %}
         Browse services
       {% endif %}
@@ -26,7 +27,7 @@
       <select name="category" class="form-select">
         <option value="">All categories</option>
         {% for cat in categories %}
-          <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+          <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.name }}</option>
         {% endfor %}
       </select>
     </div>
@@ -40,7 +41,7 @@
       <div class="col-md-4">
         <a href="{% url 'service_detail' s.pk %}" class="text-decoration-none">
           <div class="service-card">
-            <div class="thumb">{{ s.category.icon }}</div>
+            <div class="thumb"><span class="icon-badge">{{ s.category.slug|category_icon }}</span></div>
             <div class="body">
               <span class="badge-cat">{{ s.category.name }}</span>
               <h3 class="h6 mt-2 mb-1 text-ink">{{ s.title }}</h3>

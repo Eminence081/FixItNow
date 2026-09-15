@@ -1,0 +1,80 @@
+{% extends "core/base.html" %}
+{% load core_extras %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-5">
+    <div class="col-lg-4">
+      <div class="card-plain p-4 h-100">
+        <div class="d-flex align-items-center justify-content-center rounded-circle bg-light mx-auto" style="width:86px;height:86px;font-weight:800;font-size:2rem;">
+          {{ provider_profile.user.username|slice:":1"|upper }}
+        </div>
+        <div class="text-center mt-3">
+          <h1 class="h3 mb-1">{{ provider_profile.business_name|default:provider_profile.user.get_full_name|default:provider_profile.user.username }}</h1>
+          <div class="text-muted small mb-2">{{ provider_profile.city }}</div>
+          {% if provider_profile.average_rating %}
+            <span class="rating-pill">⭐ {{ provider_profile.average_rating }} ({{ provider_profile.review_count }})</span>
+          {% else %}
+            <span class="text-muted small">No reviews yet</span>
+          {% endif %}
+        </div>
+
+        <hr>
+        <div class="text-muted small">
+          <div class="mb-2"><strong>Experience:</strong> {{ provider_profile.years_experience }} years</div>
+          <div class="mb-2"><strong>Jobs completed:</strong> {{ provider_profile.completed_jobs }}</div>
+          {% if provider_profile.phone %}<div class="mb-2"><strong>Phone:</strong> {{ provider_profile.phone }}</div>{% endif %}
+        </div>
+
+        {% if provider_profile.bio %}
+          <p class="text-muted small mt-3 mb-0">{{ provider_profile.bio }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="section-heading d-flex justify-content-between align-items-center">
+        <h2 class="h3 mb-0">Services by this provider</h2>
+        <a class="btn btn-accent btn-sm" href="{% url 'browse_services' %}?provider={{ provider_profile.user.id }}">Browse all</a>
+      </div>
+
+      <div class="row g-4">
+        {% for service in services %}
+          <div class="col-md-6">
+            <a href="{% url 'service_detail' service.pk %}" class="text-decoration-none">
+              <div class="service-card">
+                <div class="thumb"><span class="icon-badge">{{ service.category.slug|category_icon }}</span></div>
+                <div class="body">
+                  <span class="badge-cat">{{ service.category.name }}</span>
+                  <h3 class="h6 mt-2 mb-1 text-ink">{{ service.title }}</h3>
+                  <div class="text-muted small mb-2">{{ service.city }}</div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="price-tag">₦{{ service.price|floatformat:0 }}</span>
+                    {% if service.average_rating %}<span class="rating-pill">⭐ {{ service.average_rating }}</span>{% endif %}
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% empty %}
+          <p class="text-muted">No services listed yet.</p>
+        {% endfor %}
+      </div>
+
+      <div class="mt-5">
+        <h2 class="h4">Recent reviews</h2>
+        {% for review in reviews %}
+          <div class="card-plain p-3 mb-3">
+            <div class="d-flex justify-content-between">
+              <strong>{{ review.booking.client.get_full_name|default:review.booking.client.username }}</strong>
+              <span class="rating-pill">⭐ {{ review.rating }}</span>
+            </div>
+            <p class="text-muted small mt-2 mb-0">{{ review.comment }}</p>
+          </div>
+        {% empty %}
+          <p class="text-muted">No public reviews yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -33,6 +33,15 @@ SECRET_KEY = os.environ.get(
 # Set DJANGO_DEBUG=False as an environment variable on the live server.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 # Comma-separated list via env var, e.g.
 # DJANGO_ALLOWED_HOSTS=myapp.eu-north-1.elasticbeanstalk.com,.elasticbeanstalk.com
 _allowed_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
@@ -146,6 +155,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': os.environ.get(
+            'DJANGO_EMAIL_BACKEND',
+            'django.core.mail.backends.console.EmailBackend' if DEBUG
+            else 'django.core.mail.backends.smtp.EmailBackend',
+        ),
     },
 }

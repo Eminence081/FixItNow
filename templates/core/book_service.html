@@ -1,19 +1,30 @@
 {% extends "core/base.html" %}
 {% block content %}
-<div class="container py-5" style="max-width:560px;">
-  <div class="card-plain p-4 p-md-5">
-    <h1 class="h3 mb-1">Book: {{ service.title }}</h1>
-    <p class="text-muted mb-4">₦{{ service.price|floatformat:0 }} · {{ service.duration_minutes }} min</p>
-    <form method="post">
-      {% csrf_token %}
-      <div class="row g-3 mb-3">
-        <div class="col-md-6"><label class="form-label">Date</label>{{ form.scheduled_date }}</div>
-        <div class="col-md-6"><label class="form-label">Time</label>{{ form.scheduled_time }}</div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card-plain p-4 p-md-5">
+        <div class="section-heading d-flex justify-content-between align-items-center gap-3 flex-wrap">
+          <div>
+            <span class="badge-cat">Booking request</span>
+            <h1 class="h3 mt-3 mb-1">Book: {{ service.title }}</h1>
+          </div>
+          <span class="price-tag">₦{{ service.price|floatformat:0 }}</span>
+        </div>
+
+        <p class="text-muted mb-4">{{ service.duration_minutes }} min · {{ service.city }}</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><label class="form-label">Date</label>{{ form.scheduled_date }}</div>
+            <div class="col-md-6"><label class="form-label">Time</label>{{ form.scheduled_time }}</div>
+          </div>
+          <div class="mb-3"><label class="form-label">Address</label>{{ form.address }}</div>
+          <div class="mb-4"><label class="form-label">Notes for the provider (optional)</label>{{ form.notes }}</div>
+          <button type="submit" class="btn btn-accent w-100">Send booking request</button>
+        </form>
       </div>
-      <div class="mb-3"><label class="form-label">Address</label>{{ form.address }}</div>
-      <div class="mb-4"><label class="form-label">Notes for the provider (optional)</label>{{ form.notes }}</div>
-      <button type="submit" class="btn btn-accent w-100">Send booking request</button>
-    </form>
+    </div>
   </div>
 </div>
 {% endblock %}

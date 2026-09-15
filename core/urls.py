@@ -12,6 +12,7 @@ urlpatterns = [
     path("services/<int:pk>/edit/", views.edit_service, name="edit_service"),
     path("services/<int:pk>/delete/", views.delete_service, name="delete_service"),
     path("providers/", views.provider_list, name="provider_list"),
+    path("providers/<int:pk>/", views.provider_detail, name="provider_detail"),
 
     path("register/", views.register, name="register"),
     path("login/", auth_views.LoginView.as_view(template_name="core/login.html"), name="login"),

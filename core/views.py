@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -48,6 +49,14 @@ def browse_services(request):
     paginator = Paginator(services, 9)
     page_obj = paginator.get_page(request.GET.get("page"))
 
+    provider_profile = None
+    if provider_id:
+        provider_profile = get_object_or_404(
+            Profile.objects.select_related("user"),
+            user_id=provider_id,
+            role="provider",
+        )
+
     context = {
         "page_obj": page_obj,
         "categories": Category.objects.all(),
@@ -55,7 +64,7 @@ def browse_services(request):
         "selected_category": category_slug,
         "city": city,
         "provider_id": provider_id,
-        "provider_filter": services.first().provider if provider_id and services.exists() else None,
+        "provider_profile": provider_profile,
     }
     return render(request, "core/browse.html", context)
 
@@ -83,7 +92,47 @@ def service_detail(request, pk):
 
 def provider_list(request):
     providers = Profile.objects.filter(role="provider", is_approved=True).select_related("user")
-    return render(request, "core/providers.html", {"providers": providers})
+
+    query = request.GET.get("q", "").strip()
+    city = request.GET.get("city", "").strip()
+
+    if query:
+        providers = providers.filter(
+            Q(user__username__icontains=query)
+            | Q(user__first_name__icontains=query)
+            | Q(user__last_name__icontains=query)
+            | Q(business_name__icontains=query)
+            | Q(bio__icontains=query)
+        )
+    if city:
+        providers = providers.filter(city__icontains=city)
+
+    return render(request, "core/providers.html", {"providers": providers, "query": query, "city": city})
+
+
+def provider_detail(request, pk):
+    provider_user = get_object_or_404(User, pk=pk)
+    provider_profile = get_object_or_404(
+        Profile.objects.select_related("user"),
+        user=provider_user,
+        role="provider",
+        is_approved=True,
+    )
+    services = Service.objects.filter(provider=provider_user, is_active=True).select_related(
+        "category"
+    )
+    reviews = Review.objects.filter(booking__service__provider=provider_user).select_related(
+        "booking__client", "booking__service"
+    )
+    return render(
+        request,
+        "core/provider_detail.html",
+        {
+            "provider_profile": provider_profile,
+            "services": services,
+            "reviews": reviews,
+        },
+    )
 
 
 def register(request):
