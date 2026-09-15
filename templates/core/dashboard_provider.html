@@ -20,6 +20,10 @@
           <div>
             <div class="fw-bold">{{ b.service.title }}</div>
             <div class="text-muted small">from {{ b.client.get_full_name|default:b.client.username }} · {{ b.scheduled_date }} at {{ b.scheduled_time }}</div>
+            {% if b.client.profile.phone %}
+              <a href="tel:{{ b.client.profile.phone }}" class="small text-decoration-none">Call client: {{ b.client.profile.phone }}</a>
+              <a href="https://wa.me/{{ b.client.profile.phone|cut:' '|cut:'-'|cut:'+' }}" class="small text-decoration-none">WhatsApp client</a>
+            {% endif %}
             <div class="text-muted small">{{ b.address }}{% if b.notes %} · "{{ b.notes }}"{% endif %}</div>
           </div>
           <div class="text-end">

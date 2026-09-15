@@ -20,6 +20,7 @@
           </div>
           {% if b.service.provider.profile.phone %}
             <a href="tel:{{ b.service.provider.profile.phone }}" class="small text-decoration-none">Call provider: {{ b.service.provider.profile.phone }}</a>
+            <a href="https://wa.me/{{ b.service.provider.profile.phone|cut:' '|cut:'-'|cut:'+' }}" class="small text-decoration-none">WhatsApp provider</a>
           {% else %}
             <div class="text-muted small">Provider phone number not available.</div>
           {% endif %}
