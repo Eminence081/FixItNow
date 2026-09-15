@@ -29,7 +29,9 @@
         <ul class="navbar-nav align-items-lg-center gap-lg-2">
           {% if user.is_authenticated %}
             <li class="nav-item"><span class="nav-link small text-muted">Welcome, {{ user.first_name|default:user.username }}</span></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+            {% if not user.is_staff %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+            {% endif %}
             {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin_analytics' %}">Analytics</a></li>{% endif %}
             <li class="nav-item">
               <form action="{% url 'logout' %}" method="post" class="d-inline">
