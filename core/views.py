@@ -237,11 +237,19 @@ def dashboard(request):
         bookings = Booking.objects.filter(client=request.user).select_related(
             "service", "service__provider", "quote__provider", "quote__provider__profile", "quote__request"
         )
+        service_requests = ServiceRequest.objects.filter(
+            client=request.user
+        ).select_related("category")
         saved_providers = SavedProvider.objects.filter(client=request.user).select_related("provider")
         return render(
             request,
             "core/dashboard_client.html",
-            {"profile": profile, "bookings": bookings, "saved_providers": saved_providers},
+            {
+                "profile": profile,
+                "bookings": bookings,
+                "service_requests": service_requests,
+                "saved_providers": saved_providers,
+            },
         )
 
 
@@ -332,7 +340,12 @@ def book_service(request, pk):
 
 @login_required
 def update_booking_status(request, pk, status):
-    booking = get_object_or_404(Booking, pk=pk, service__provider=request.user)
+    booking = get_object_or_404(
+        Booking.objects.filter(
+            Q(service__provider=request.user) | Q(quote__provider=request.user)
+        ),
+        pk=pk,
+    )
     valid_transitions = {
         "confirmed": ["pending"],
         "declined": ["pending"],
@@ -545,30 +558,36 @@ def request_detail(request, pk):
 
 @login_required
 def accept_quote(request, pk):
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
     quote = get_object_or_404(Quote, pk=pk, request__client=request.user)
     if quote.request.status != "open":
         messages.error(request, "This service request is already closed.")
         return redirect("request_detail", pk=quote.request.pk)
 
-    quote.accepted = True
-    quote.save(update_fields=["accepted"])
-    quote.request.status = "closed"
-    quote.request.save(update_fields=["status"])
-    Booking.objects.create(
-        client=request.user,
-        quote=quote,
-        service=None,
-        address="",
-        status="confirmed",
-    )
-    messages.success(
+    if request.method == "POST":
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            quote.accepted = True
+            quote.save(update_fields=["accepted"])
+            quote.request.status = "closed"
+            quote.request.save(update_fields=["status"])
+            booking = form.save(commit=False)
+            booking.client = request.user
+            booking.quote = quote
+            booking.service = None
+            booking.status = "confirmed"
+            booking.save()
+            messages.success(
+                request,
+                "Quote accepted! You can now contact the provider directly to arrange scheduling.",
+            )
+            return redirect("request_detail", pk=quote.request.pk)
+    else:
+        form = BookingForm()
+    return render(
         request,
-        "Quote accepted! You can now contact the provider directly to arrange scheduling.",
+        "core/accept_quote.html",
+        {"form": form, "quote": quote},
     )
-    return redirect("request_detail", pk=quote.request.pk)
 
 
 @login_required

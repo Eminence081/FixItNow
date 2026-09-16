@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card-plain p-4 p-md-5">
+        <span class="badge-cat">Confirm quote</span>
+        <h1 class="h3 mt-3 mb-1">Accept: {{ quote.request.title }}</h1>
+        <p class="text-muted mb-4">Quote from {{ quote.provider.profile.business_name|default:quote.provider.get_full_name|default:quote.provider.username }} · ₦{{ quote.price|floatformat:0 }}</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6"><label class="form-label">Date</label>{{ form.scheduled_date }}</div>
+            <div class="col-md-6"><label class="form-label">Time</label>{{ form.scheduled_time }}</div>
+          </div>
+          <div class="mb-3"><label class="form-label">Address</label>{{ form.address }}</div>
+          <div class="mb-4"><label class="form-label">Notes for the provider (optional)</label>{{ form.notes }}</div>
+          <button type="submit" class="btn btn-accent w-100">Confirm and accept quote</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

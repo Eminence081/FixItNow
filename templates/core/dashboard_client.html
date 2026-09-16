@@ -54,6 +54,23 @@
   {% endfor %}
 
   <section class="mt-5">
+    <h2 class="h5 mb-3">My requests</h2>
+    <div class="row g-3">
+      {% for service_request in service_requests %}
+        <div class="col-md-4">
+          <div class="card-plain p-3 h-100">
+            <div class="fw-bold">{{ service_request.title }}</div>
+            <div class="text-muted small">{{ service_request.category.name }} · {{ service_request.get_status_display }}</div>
+            <a href="{% url 'request_detail' service_request.pk %}" class="small">View request and quotes</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">No service requests yet. <a href="{% url 'post_request' %}">Post a request</a></p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mt-5">
     <h2 class="h5 mb-3">Saved providers</h2>
     <div class="row g-3">
       {% for saved in saved_providers %}
