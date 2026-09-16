@@ -616,8 +616,7 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
 }
 
 .form-control,
-.form-select,
-.form-check-input {
+.form-select {
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-strong);
   min-height: 48px;
@@ -632,6 +631,13 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
   border-color: var(--sage-deep);
   box-shadow: 0 0 0 4px rgba(40,78,55,0.12);
   background: var(--paper);
+}
+
+.form-check-input {
+  width: 1em;
+  height: 1em;
+  min-height: 0;
+  padding: 0;
 }
 
 textarea.form-control {

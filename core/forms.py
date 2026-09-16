@@ -12,7 +12,7 @@ class BootstrapFormMixin:
         for name, field in self.fields.items():
             widget = field.widget
             if isinstance(widget, forms.CheckboxInput):
-                widget.attrs.setdefault("class", "form-check-input")
+                widget.attrs["class"] = "form-check-input"
             elif isinstance(widget, forms.RadioSelect):
                 continue
             elif isinstance(widget, (forms.Select, forms.SelectMultiple)):
