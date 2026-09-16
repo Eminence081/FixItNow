@@ -90,7 +90,10 @@ class ServiceRequestForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = ServiceRequest
         fields = ["category", "title", "description", "budget_range", "city", "urgency"]
-        widgets = {"description": forms.Textarea(attrs={"rows": 5})}
+        widgets = {
+            "category": forms.Select(attrs={"class": "form-select searchable-select"}),
+            "description": forms.Textarea(attrs={"rows": 5}),
+        }
 
 
 class QuoteForm(BootstrapFormMixin, forms.ModelForm):
