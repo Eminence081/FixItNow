@@ -300,11 +300,22 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
 
 .hero .form-control {
   min-height: 54px;
+  min-width: 0;
+  flex: 1 1 auto;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(255,255,255,0.65);
   background: rgba(255,255,255,0.14);
+  background-color: rgba(255,255,255,0.14);
   color: var(--paper);
   box-shadow: none;
+}
+
+.hero .form-control:hover,
+.hero .form-control:focus,
+.hero .form-control:active {
+  background: rgba(255,255,255,0.14);
+  background-color: rgba(255,255,255,0.14);
+  color: var(--paper);
 }
 
 .hero input.form-control:-webkit-autofill,
@@ -845,6 +856,23 @@ textarea.form-control {
 
   .hero .d-flex.gap-3 {
     flex-wrap: wrap;
+  }
+
+  .hero form {
+    width: 100%;
+    max-width: 100% !important;
+  }
+
+  .hero form .form-control {
+    min-height: 48px;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .hero form .btn {
+    flex: 0 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .service-card .thumb {

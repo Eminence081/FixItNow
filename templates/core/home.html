@@ -101,12 +101,26 @@
 
 <section class="py-5">
   <div class="container">
-    <div class="d-flex flex-wrap gap-2 justify-content-center py-4">
+    <div class="d-flex flex-wrap gap-2 justify-content-center py-4" id="category-chips">
       {% for cat in categories %}
-        <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
-          <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
-        </a>
+        {% if cat.slug in "plumbing electrical cleaning moving painting appliance-repair gardening carpentry" %}
+          <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
+            <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
+          </a>
+        {% endif %}
       {% endfor %}
+      <button type="button" class="category-chip border-0" id="categories-toggle" aria-expanded="false">See more</button>
+      <div class="categories-more w-100" style="display:none">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+          {% for cat in categories %}
+            {% if cat.slug not in "plumbing electrical cleaning moving painting appliance-repair gardening carpentry" %}
+              <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
+                <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
 </section>

@@ -4,6 +4,17 @@ document.addEventListener('DOMContentLoaded', function () {
     new Choices(el, { searchEnabled: true, itemSelectText: '', shouldSort: false });
   });
 
+  const categoriesToggle = document.getElementById('categories-toggle');
+  const categoriesMore = document.querySelector('.categories-more');
+  if (categoriesToggle && categoriesMore) {
+    categoriesToggle.addEventListener('click', function () {
+      const expanded = categoriesToggle.getAttribute('aria-expanded') === 'true';
+      categoriesMore.style.display = expanded ? 'none' : 'block';
+      categoriesToggle.setAttribute('aria-expanded', String(!expanded));
+      categoriesToggle.textContent = expanded ? 'See more' : 'Show less';
+    });
+  }
+
   // --- Interactive star-rating picker -------------------------------
   // Replaces the plain <select> for ratings with clickable stars.
   // Falls back gracefully to the select if JS is disabled (progressive
