@@ -52,7 +52,10 @@ class ServiceForm(BootstrapFormMixin, forms.ModelForm):
             "category", "title", "description", "price",
             "duration_minutes", "city", "image", "is_active",
         ]
-        widgets = {"description": forms.Textarea(attrs={"rows": 4})}
+        widgets = {
+            "category": forms.Select(attrs={"class": "form-select searchable-select"}),
+            "description": forms.Textarea(attrs={"rows": 4}),
+        }
 
 
 class BookingForm(BootstrapFormMixin, forms.ModelForm):

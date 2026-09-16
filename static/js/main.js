@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+  document.querySelectorAll('.searchable-select').forEach(function (el) {
+    new Choices(el, { searchEnabled: true, itemSelectText: '', shouldSort: false });
+  });
+
   // --- Interactive star-rating picker -------------------------------
   // Replaces the plain <select> for ratings with clickable stars.
   // Falls back gracefully to the select if JS is disabled (progressive
