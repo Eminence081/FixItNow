@@ -30,7 +30,6 @@ class RegisterForm(BootstrapFormMixin, UserCreationForm):
     bio = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 4}))
     years_experience = forms.IntegerField(min_value=0, required=False)
     is_available = forms.BooleanField(required=False, initial=True)
-    status_note = forms.CharField(max_length=100, required=False)
 
     class Meta:
         model = User
@@ -41,8 +40,7 @@ class ProfileForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            "phone", "city", "avatar",
-            "business_name", "bio", "years_experience", "is_available", "status_note",
+            "phone", "city", "business_name", "bio", "years_experience", "is_available",
         ]
         widgets = {"bio": forms.Textarea(attrs={"rows": 4})}
 

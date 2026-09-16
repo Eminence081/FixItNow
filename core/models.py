@@ -13,18 +13,12 @@ class Profile(models.Model):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=20, blank=True)
     city = models.CharField(max_length=80, blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
     business_name = models.CharField(max_length=120, blank=True)
     bio = models.TextField(blank=True)
     years_experience = models.PositiveIntegerField(default=0)
     is_approved = models.BooleanField(default=True)
     is_available = models.BooleanField(default=True)
-    status_note = models.CharField(
-        max_length=100,
-        blank=True,
-        help_text="e.g. 'Busy until 3pm', 'On a job'",
-    )
 
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} ({self.role})"

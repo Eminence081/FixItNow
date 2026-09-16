@@ -179,6 +179,11 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+.availability-toggle {
+  padding: 0.25rem 0.5rem;
+  line-height: 1.5;
+}
+
 .btn:hover {
   transform: translateY(-2px);
 }

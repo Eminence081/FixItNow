@@ -197,7 +197,6 @@ def register(request):
                     "bio": form.cleaned_data.get("bio", ""),
                     "years_experience": form.cleaned_data.get("years_experience") or 0,
                     "is_available": form.cleaned_data.get("is_available", True),
-                    "status_note": form.cleaned_data.get("status_note", ""),
                 })
             Profile.objects.create(**profile_data)
             login(request, user)
@@ -247,7 +246,7 @@ def dashboard(request):
 def edit_profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated.")
