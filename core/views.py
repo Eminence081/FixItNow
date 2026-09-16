@@ -218,13 +218,16 @@ def post_login_redirect(request):
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
     if profile.role == "provider":
-        bookings = Booking.objects.filter(service__provider=request.user).select_related(
-            "service", "client"
+        bookings = Booking.objects.filter(
+            Q(service__provider=request.user) | Q(quote__provider=request.user)
+        ).select_related(
+            "service", "quote__request", "quote", "client"
         )
         services = Service.objects.filter(provider=request.user)
         reviews = Review.objects.filter(
-            booking__service__provider=request.user
-        ).select_related("booking__client", "booking__service")
+            Q(booking__service__provider=request.user)
+            | Q(booking__quote__provider=request.user)
+        ).select_related("booking__client", "booking__service", "booking__quote__request")
         return render(
             request,
             "core/dashboard_provider.html",
@@ -232,7 +235,7 @@ def dashboard(request):
         )
     else:
         bookings = Booking.objects.filter(client=request.user).select_related(
-            "service", "service__provider"
+            "service", "service__provider", "quote__provider", "quote__provider__profile", "quote__request"
         )
         saved_providers = SavedProvider.objects.filter(client=request.user).select_related("provider")
         return render(
@@ -379,12 +382,12 @@ def delete_booking_record(request, pk):
         messages.error(request, "Only finished or cancelled bookings can be deleted.")
         return redirect("dashboard")
     if request.method == "POST":
-        label = booking.service.title
+        label = booking.display_title
         booking.delete()
         messages.success(request, f'Booking record for "{label}" deleted.')
         return redirect("dashboard")
     return render(request, "core/confirm_delete.html", {
-        "object_label": booking.service.title,
+        "object_label": booking.display_title,
         "object_type": "booking record",
         "cancel_url": "dashboard",
     })
@@ -398,7 +401,7 @@ def delete_review(request, pk):
         messages.success(request, "Review deleted.")
         return redirect("dashboard")
     return render(request, "core/confirm_delete.html", {
-        "object_label": f"your review of {review.booking.service.title}",
+        "object_label": f"your review of {review.booking.display_title}",
         "object_type": "review",
         "cancel_url": "dashboard",
     })
@@ -428,7 +431,13 @@ def leave_review(request, pk):
 
 @login_required
 def reply_to_review(request, pk):
-    review = get_object_or_404(Review, pk=pk, booking__service__provider=request.user)
+    review = get_object_or_404(
+        Review.objects.filter(
+            Q(booking__service__provider=request.user)
+            | Q(booking__quote__provider=request.user)
+        ),
+        pk=pk,
+    )
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     form = ReviewReplyForm(request.POST, instance=review)
@@ -520,6 +529,7 @@ def request_detail(request, pk):
     )
     quotes = service_request.quotes.select_related("provider", "provider__profile")
     can_quote = False
+    can_accept_quote = request.user.is_authenticated and request.user == service_request.client
     if request.user.is_authenticated:
         try:
             can_quote = request.user.profile.role == "provider" and service_request.status == "open"
@@ -529,7 +539,36 @@ def request_detail(request, pk):
         "service_request": service_request,
         "quotes": quotes,
         "can_quote": can_quote,
+        "can_accept_quote": can_accept_quote,
     })
+
+
+@login_required
+def accept_quote(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    quote = get_object_or_404(Quote, pk=pk, request__client=request.user)
+    if quote.request.status != "open":
+        messages.error(request, "This service request is already closed.")
+        return redirect("request_detail", pk=quote.request.pk)
+
+    quote.accepted = True
+    quote.save(update_fields=["accepted"])
+    quote.request.status = "closed"
+    quote.request.save(update_fields=["status"])
+    Booking.objects.create(
+        client=request.user,
+        quote=quote,
+        service=None,
+        address="",
+        status="confirmed",
+    )
+    messages.success(
+        request,
+        "Quote accepted! You can now contact the provider directly to arrange scheduling.",
+    )
+    return redirect("request_detail", pk=quote.request.pk)
 
 
 @login_required

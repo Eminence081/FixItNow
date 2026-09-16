@@ -14,14 +14,15 @@
     <div class="card-plain p-3 mb-3">
       <div class="d-flex justify-content-between flex-wrap gap-2">
         <div>
-          <div class="fw-bold">{{ b.service.title }}</div>
+          <div class="fw-bold">{{ b.display_title }}</div>
           <div class="text-muted small">
-            with {{ b.service.provider.get_full_name|default:b.service.provider.username }}
-            · {{ b.scheduled_date }} at {{ b.scheduled_time }}
+            with {{ b.display_provider.get_full_name|default:b.display_provider.username }}
+            · ₦{{ b.display_price|floatformat:0 }}
+            {% if b.scheduled_date %}· {{ b.scheduled_date }} at {{ b.scheduled_time }}{% endif %}
           </div>
-          {% if b.service.provider.profile.phone %}
-            <a href="tel:{{ b.service.provider.profile.phone }}" class="small text-decoration-none">Call provider: {{ b.service.provider.profile.phone }}</a>
-            <a href="https://wa.me/{{ b.service.provider.profile.phone|cut:' '|cut:'-'|cut:'+' }}" class="small text-decoration-none">WhatsApp provider</a>
+          {% if b.display_provider.profile.phone %}
+            <a href="tel:{{ b.display_provider.profile.phone }}" class="small text-decoration-none">Call provider: {{ b.display_provider.profile.phone }}</a>
+            <a href="https://wa.me/{{ b.display_provider.profile.phone|cut:' '|cut:'-'|cut:'+' }}" class="small text-decoration-none">WhatsApp provider</a>
           {% else %}
             <div class="text-muted small">Provider phone number not available.</div>
           {% endif %}
@@ -35,9 +36,9 @@
             {% endif %}
             {% if b.status == "completed" and not b.has_review %}
               <a href="{% url 'leave_review' b.pk %}" class="btn btn-sm btn-accent">Leave review</a>
-              <a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>
+              {% if b.service %}<a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>{% endif %}
             {% endif %}
-            {% if b.status == "completed" and b.has_review %}<a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>{% endif %}
+            {% if b.status == "completed" and b.has_review and b.service %}<a href="{% url 'book_service' b.service.pk %}" class="btn btn-sm btn-outline-ink">Book again</a>{% endif %}
             {% if b.status == "completed" and b.has_review %}
               <a href="{% url 'delete_review' b.review.pk %}" class="btn btn-sm btn-outline-ink text-danger">Delete review</a>
             {% endif %}

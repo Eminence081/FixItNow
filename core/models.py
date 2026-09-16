@@ -102,10 +102,13 @@ class Booking(models.Model):
         User, on_delete=models.CASCADE, related_name="bookings_made"
     )
     service = models.ForeignKey(
-        Service, on_delete=models.CASCADE, related_name="bookings"
+        Service, on_delete=models.CASCADE, related_name="bookings", null=True, blank=True
     )
-    scheduled_date = models.DateField()
-    scheduled_time = models.TimeField()
+    quote = models.ForeignKey(
+        "Quote", on_delete=models.SET_NULL, related_name="booking", null=True, blank=True
+    )
+    scheduled_date = models.DateField(null=True, blank=True)
+    scheduled_time = models.TimeField(null=True, blank=True)
     address = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="pending")
@@ -115,7 +118,19 @@ class Booking(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.service.title} — {self.client.username} ({self.status})"
+        return f"{self.display_title} — {self.client.username} ({self.status})"
+
+    @property
+    def display_title(self):
+        return self.service.title if self.service else (self.quote.request.title if self.quote else "Service request")
+
+    @property
+    def display_provider(self):
+        return self.service.provider if self.service else (self.quote.provider if self.quote else None)
+
+    @property
+    def display_price(self):
+        return self.service.price if self.service else (self.quote.price if self.quote else None)
 
     @property
     def has_review(self):
@@ -133,7 +148,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.rating}★ for {self.booking.service.title}"
+        return f"{self.rating}★ for {self.booking.display_title}"
 
 
 class SavedProvider(models.Model):
@@ -169,6 +184,7 @@ class Quote(models.Model):
     provider = models.ForeignKey(User, on_delete=models.CASCADE, related_name="quotes_submitted")
     price = models.DecimalField(max_digits=10, decimal_places=2)
     message = models.TextField()
+    accepted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

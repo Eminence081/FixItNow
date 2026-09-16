@@ -35,4 +35,5 @@ urlpatterns = [
     path("requests/", views.browse_requests, name="browse_requests"),
     path("requests/<int:pk>/", views.request_detail, name="request_detail"),
     path("requests/<int:pk>/quote/", views.submit_quote, name="submit_quote"),
+    path("requests/quotes/<int:pk>/accept/", views.accept_quote, name="accept_quote"),
 ]
