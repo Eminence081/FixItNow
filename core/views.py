@@ -209,6 +209,13 @@ def register(request):
 
 
 @login_required
+def post_login_redirect(request):
+    if request.user.is_staff:
+        return redirect("admin_analytics")
+    return redirect("dashboard")
+
+
+@login_required
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
     if profile.role == "provider":
