@@ -355,7 +355,9 @@ a:hover { color: var(--amber-deep); text-decoration: none; }
 
 .hero-illustration {
   width: min(100%, 550px);
+  max-width: 100%;
   height: auto;
+  display: block;
 }
 
 .hero-visual svg {
@@ -800,6 +802,41 @@ textarea.form-control {
 
   .hero {
     padding: 2rem 0 2.2rem;
+  }
+
+  .hero::before,
+  .hero::after {
+    width: 180px;
+    height: 180px;
+  }
+
+  .hero::before {
+    left: 0;
+    top: -60px;
+  }
+
+  .hero::after {
+    right: 0;
+    bottom: -60px;
+  }
+
+  .hero .row {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .hero-visual {
+    width: 100%;
+    max-width: 100%;
+    min-height: 260px;
+    overflow: hidden;
+    padding: 0.5rem;
+  }
+
+  .hero-illustration {
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero h1 {
