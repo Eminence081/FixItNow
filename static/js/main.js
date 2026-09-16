@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (categoriesToggle && categoriesMore) {
     categoriesToggle.addEventListener('click', function () {
       const expanded = categoriesToggle.getAttribute('aria-expanded') === 'true';
-      categoriesMore.style.display = expanded ? 'none' : 'block';
+      categoriesMore.style.display = expanded ? 'none' : 'contents';
       categoriesToggle.setAttribute('aria-expanded', String(!expanded));
       categoriesToggle.textContent = expanded ? 'See more' : 'Show less';
     });

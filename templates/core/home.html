@@ -109,18 +109,16 @@
           </a>
         {% endif %}
       {% endfor %}
-      <button type="button" class="category-chip border-0" id="categories-toggle" aria-expanded="false">See more</button>
-      <div class="categories-more w-100" style="display:none">
-        <div class="d-flex flex-wrap gap-2 justify-content-center">
-          {% for cat in categories %}
-            {% if cat.slug not in "plumbing electrical cleaning moving painting appliance-repair gardening carpentry" %}
-              <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
-                <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
-              </a>
-            {% endif %}
-          {% endfor %}
-        </div>
+      <div class="categories-more" style="display:none">
+        {% for cat in categories %}
+          {% if cat.slug not in "plumbing electrical cleaning moving painting appliance-repair gardening carpentry" %}
+            <a href="{% url 'browse_services' %}?category={{ cat.slug }}" class="category-chip">
+              <span class="icon-badge">{{ cat.slug|category_icon }}</span> {{ cat.name }}
+            </a>
+          {% endif %}
+        {% endfor %}
       </div>
+      <button type="button" class="category-chip border-0" id="categories-toggle" aria-expanded="false">See more</button>
     </div>
   </div>
 </section>
